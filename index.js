@@ -1,9 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import { MongoClient, ServerApiVersion } from 'mongodb';
+import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
 
 const app = express();
-const port = process.env.P
+const port = process.env.PORT || 5000;
+
 // Middlewares
 app.use(cors());
 app.use(express.json());
@@ -32,7 +33,7 @@ async function run() {
         // const userCollection = client.db('usersDB').collection('users)
 
         app.get('/users', async (req, res) => {
-            const cursor = userCollection.find() 
+            const cursor = userCollection.find()
             const result = await cursor.toArray();
             res.send(result);
         })
@@ -42,6 +43,14 @@ async function run() {
             const user = req.body;
             console.log('new user: ', user);
             const result = await userCollection.insertOne(user);
+            res.send(result);
+        });
+
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log('please, delete id: ', id);
+            const query = { _id: new ObjectId(id) }
+            const result = await userCollection.deleteOne(query);
             res.send(result);
         });
 
