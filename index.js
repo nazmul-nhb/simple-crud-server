@@ -3,8 +3,7 @@ import cors from 'cors';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
 const app = express();
-const port = process.env.PORT || 5000;
-
+const port = process.env.P
 // Middlewares
 app.use(cors());
 app.use(express.json());
@@ -32,6 +31,13 @@ async function run() {
         // or
         // const userCollection = client.db('usersDB').collection('users)
 
+        app.get('/users', async (req, res) => {
+            const cursor = userCollection.find() 
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+        // save in database
         app.post('/users', async (req, res) => {
             const user = req.body;
             console.log('new user: ', user);
