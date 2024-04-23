@@ -32,10 +32,18 @@ async function run() {
         // or
         // const userCollection = client.db('usersDB').collection('users)
 
+        // send to client
         app.get('/users', async (req, res) => {
             const cursor = userCollection.find()
             const result = await cursor.toArray();
             res.send(result);
+        })
+
+        app.get('/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const user = await userCollection.findOne(query);
+            res.send(user);
         })
 
         // save in database
@@ -46,6 +54,24 @@ async function run() {
             res.send(result);
         });
 
+        // update user on mongodb
+        app.put('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const user = req.body;
+            console.log(id, ':', user);
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true }
+            const updatedUser = {
+                $set: {
+                    name: user.name,
+                    email: user.email
+                }
+            }
+            const result = await userCollection.updateOne(filter, updatedUser, options);
+            res.send(result);
+        })
+
+        // delete data from db
         app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
             console.log('please, delete id: ', id);
